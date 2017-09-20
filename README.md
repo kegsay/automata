@@ -1,2 +1,1 @@
-# automata
-A pure Go unopinionated artificial neural network library
+This project is currently a work in progress.
