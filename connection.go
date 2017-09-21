@@ -1,5 +1,7 @@
 package automata
 
+import "fmt"
+
 var connCount = 0
 
 type ConnID int64
@@ -62,7 +64,7 @@ func NewLayerConnection(from, to Layer, ltype LayerType, weights []float64) Laye
 		for i, neuron := range from.List {
 			var toNeuron *Neuron
 			if i < len(to.List) {
-				toNeuron = to.List[i]
+				toNeuron = &to.List[i]
 			}
 			conn := neuron.Project(toNeuron, weights)
 			connsByID[conn.ID] = conn
@@ -74,12 +76,12 @@ func NewLayerConnection(from, to Layer, ltype LayerType, weights []float64) Laye
 		// Each neuron in the 'from' layer gets projected to all neurons in the 'to' layer.
 		// 'ToElse' stops the neuron projecting to itself if it exists in the 'to' layer.
 		// 'ToAll' projects to all neurons regardless.
-		for fromNeuron := range from.List {
-			for toNeuron := range to.List {
+		for _, fromNeuron := range from.List {
+			for _, toNeuron := range to.List {
 				if ltype == LayerTypeAllToElse && &fromNeuron == &toNeuron {
 					continue
 				}
-				conn := fromNeuron.Project(toNeuron, weights)
+				conn := fromNeuron.Project(&toNeuron, weights)
 				connsByID[conn.ID] = conn
 				list = append(list, conn)
 			}
@@ -89,13 +91,13 @@ func NewLayerConnection(from, to Layer, ltype LayerType, weights []float64) Laye
 	}
 
 	lc := LayerConnection{
-		ID:         connUID(),
-		From:       from,
-		To:         to,
-		Type:       ltype,
-		Weights:    weights,
-		Conections: connsByID,
-		List:       list,
+		ID:          connUID(),
+		From:        from,
+		To:          to,
+		Type:        ltype,
+		Weights:     weights,
+		Connections: connsByID,
+		List:        list,
 	}
 	from.ConnectedTo = append(from.ConnectedTo, lc)
 

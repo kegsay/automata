@@ -1,13 +1,15 @@
 package automata
 
+import "fmt"
+
 // Layer represents a group of neurons which activate together.
 type Layer struct {
-	Size        int64
+	Size        int
 	List        []Neuron
 	ConnectedTo []LayerConnection
 }
 
-func NewLayer(size int64) Layer {
+func NewLayer(size int) Layer {
 	neurons := make([]Neuron, size)
 	for i := 0; i < size; i++ {
 		neurons[i] = NewNeuron()
@@ -19,25 +21,25 @@ func NewLayer(size int64) Layer {
 }
 
 // Activate all neurons in the layer.
-func (l *Layer) Activate(neurons []Neuron) []float64 {
+func (l *Layer) Activate(neurons []Neuron) ([]float64, error) {
 	var activations []float64
 
 	// Activate without an input
 	if neurons == nil {
-		for i := 0; i < l.List; i++ {
+		for i := 0; i < len(l.List); i++ {
 			activation := l.List[i].Activate(nil)
 			activations = append(activations, activation)
 		}
 	} else if len(neurons) != len(l.List) {
 		return nil, fmt.Errorf("input and layer size mismatch: cannot activate")
 	} else { // Activate with input
-		for i := 0; i < l.List; i++ {
+		for i := 0; i < len(l.List); i++ {
 			activation := l.List[i].Activate(&neurons[i])
 			activations = append(activations, activation)
 		}
 	}
 
-	return activations
+	return activations, nil
 }
 
 // Propagate an error on all neurons in this layer.
@@ -48,7 +50,7 @@ func (l *Layer) Project(toLayer Layer, ltype LayerType, weights []float64) *Laye
 	if l.isConnected(toLayer) {
 		return nil
 	}
-	lc := NewLayerConnection(l, toLayer, ltype, weights)
+	lc := NewLayerConnection(*l, toLayer, ltype, weights)
 	return &lc
 }
 

@@ -19,5 +19,9 @@ func NewNeuron() Neuron {
 }
 
 func (n *Neuron) Activate(input *Neuron) float64 {
-	return 0
+	return 0 // TODO
+}
+
+func (n *Neuron) Project(neu *Neuron, weights []float64) Connection {
+	return NewConnection(*n, *neu, weights[0]) // TODO
 }
