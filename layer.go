@@ -43,7 +43,21 @@ func (l *Layer) Activate(neurons []Neuron) ([]float64, error) {
 }
 
 // Propagate an error on all neurons in this layer.
-func (l *Layer) Propagate() {}
+func (l *Layer) Propagate(rate float64, target []float64) error {
+	if target != nil {
+		if len(target) != len(l.List) {
+			return fmt.Errorf("target and layer size mismatch: cannot propagate")
+		}
+		for i := len(l.List) - 1; i >= 0; i-- {
+			l.List[i].Propagate(rate, &target[i])
+		}
+	} else {
+		for i := len(l.List) - 1; i >= 0; i-- {
+			l.List[i].Propagate(rate, nil)
+		}
+	}
+	return nil
+}
 
 // Project a connection from this layer to another one.
 func (l *Layer) Project(toLayer Layer, ltype LayerType, weights []float64) *LayerConnection {
