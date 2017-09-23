@@ -21,20 +21,20 @@ func NewLayer(size int) Layer {
 }
 
 // Activate all neurons in the layer.
-func (l *Layer) Activate(neurons []Neuron) ([]float64, error) {
+func (l *Layer) Activate(inputs []float64) ([]float64, error) {
 	var activations []float64
 
 	// Activate without an input
-	if neurons == nil {
+	if inputs == nil {
 		for i := 0; i < len(l.List); i++ {
 			activation := l.List[i].Activate(nil)
 			activations = append(activations, activation)
 		}
-	} else if len(neurons) != len(l.List) {
+	} else if len(inputs) != len(l.List) {
 		return nil, fmt.Errorf("input and layer size mismatch: cannot activate")
 	} else { // Activate with input
 		for i := 0; i < len(l.List); i++ {
-			activation := l.List[i].Activate(&neurons[i])
+			activation := l.List[i].Activate(&inputs[i])
 			activations = append(activations, activation)
 		}
 	}

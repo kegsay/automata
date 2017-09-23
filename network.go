@@ -8,7 +8,7 @@ type Network struct {
 }
 
 // Activate the network with the given neuron, feeding forward to produce an output.
-func (n *Network) Activate(input []Neuron) ([]float64, error) {
+func (n *Network) Activate(input []float64) ([]float64, error) {
 	n.Input.Activate(input)
 	for _, layer := range n.Hidden {
 		layer.Activate(nil)

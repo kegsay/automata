@@ -9,8 +9,9 @@ type ConnID int64
 // Connection represents a connection between two neurons.
 type Connection struct {
 	ID     ConnID
-	From   Neuron
-	To     Neuron
+	From   *Neuron
+	To     *Neuron
+	Gater  *Neuron
 	Weight float64
 	Gain   float64
 }
@@ -18,8 +19,8 @@ type Connection struct {
 func NewConnection(from, to Neuron, weight float64) Connection {
 	return Connection{
 		ID:     connUID(),
-		From:   from,
-		To:     to,
+		From:   &from,
+		To:     &to,
 		Weight: weight,
 	}
 }
