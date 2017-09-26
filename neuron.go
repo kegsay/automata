@@ -18,7 +18,7 @@ type Neuron struct {
 	State      float64
 	Derivative float64
 	Activation float64
-	Self       Connection
+	Self       *Connection
 	Squash     Squasher
 	Bias       float64
 	Neighbours map[NeuronID]*Neuron
@@ -147,8 +147,33 @@ func (n *Neuron) Propagate(rate float64, target *float64) {
 	n.learn(rate)
 }
 
-func (n *Neuron) Project(neu *Neuron, weights []float64) Connection {
-	return NewConnection(*n, *neu, weights[0]) // TODO
+func (n *Neuron) Project(targetNeuron *Neuron, weight *float64) *Connection {
+	if targetNeuron == n {
+		n.Self.Weight = 1 // make connection live (1 = connected)
+		return n.Self
+	}
+
+	// check if this connection already exists
+	conn := n.Projected.getConnectionForNeuron(targetNeuron)
+	if conn != nil {
+		if weight != nil {
+			conn.Weight = *weight
+		}
+		return conn
+	} else {
+		conn = NewConnection(*n, *targetNeuron, *weight)
+
+		// reference this connection and traces
+		n.Projected[conn.ID] = conn
+		n.Neighbours[targetNeuron.ID] = targetNeuron
+		targetNeuron.Inputs[conn.ID] = conn
+		targetNeuron.TraceEligibility[conn.ID] = 0
+		for nID := range n.TraceExtended {
+			trace := n.TraceExtended[nID]
+			trace[conn.ID] = 0
+		}
+		return conn
+	}
 }
 
 // learn by adjusting weights.

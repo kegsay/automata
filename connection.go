@@ -16,8 +16,8 @@ type Connection struct {
 	Gain   float64
 }
 
-func NewConnection(from, to Neuron, weight float64) Connection {
-	return Connection{
+func NewConnection(from, to Neuron, weight float64) *Connection {
+	return &Connection{
 		ID:     connUID(),
 		From:   &from,
 		To:     &to,
@@ -25,7 +25,16 @@ func NewConnection(from, to Neuron, weight float64) Connection {
 	}
 }
 
-type ConnMap map[ConnID]Connection
+type ConnMap map[ConnID]*Connection
+
+func (m ConnMap) getConnectionForNeuron(n *Neuron) *Connection {
+	for _, conn := range m {
+		if conn.From == n || conn.To == n {
+			return conn
+		}
+	}
+	return nil
+}
 
 type LayerType int
 
@@ -44,7 +53,7 @@ type LayerConnection struct {
 	Type        LayerType
 	Weights     []float64
 	Connections ConnMap
-	List        []Connection
+	List        []*Connection
 }
 
 func NewLayerConnection(from, to Layer, ltype LayerType, weights []float64) LayerConnection {
@@ -56,7 +65,7 @@ func NewLayerConnection(from, to Layer, ltype LayerType, weights []float64) Laye
 		}
 	}
 
-	var list []Connection
+	var list []*Connection
 	connsByID := make(ConnMap)
 	switch ltype {
 	case LayerTypeOneToOne:
@@ -67,7 +76,7 @@ func NewLayerConnection(from, to Layer, ltype LayerType, weights []float64) Laye
 			if i < len(to.List) {
 				toNeuron = &to.List[i]
 			}
-			conn := neuron.Project(toNeuron, weights)
+			conn := neuron.Project(toNeuron, &weights[0])
 			connsByID[conn.ID] = conn
 			list = append(list, conn)
 		}
@@ -82,7 +91,7 @@ func NewLayerConnection(from, to Layer, ltype LayerType, weights []float64) Laye
 				if ltype == LayerTypeAllToElse && &fromNeuron == &toNeuron {
 					continue
 				}
-				conn := fromNeuron.Project(&toNeuron, weights)
+				conn := fromNeuron.Project(&toNeuron, &weights[0])
 				connsByID[conn.ID] = conn
 				list = append(list, conn)
 			}
