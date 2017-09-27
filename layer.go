@@ -4,7 +4,6 @@ import "fmt"
 
 // Layer represents a group of neurons which activate together.
 type Layer struct {
-	Size        int
 	List        []Neuron
 	ConnectedTo []LayerConnection
 }
@@ -15,7 +14,6 @@ func NewLayer(size int) Layer {
 		neurons[i] = NewNeuron()
 	}
 	return Layer{
-		Size: size,
 		List: neurons,
 	}
 }
@@ -60,11 +58,11 @@ func (l *Layer) Propagate(rate float64, target []float64) error {
 }
 
 // Project a connection from this layer to another one.
-func (l *Layer) Project(toLayer Layer, ltype LayerType, weights []float64) *LayerConnection {
+func (l *Layer) Project(toLayer *Layer, ltype LayerType, weights []float64) *LayerConnection {
 	if l.isConnected(toLayer) {
 		return nil
 	}
-	lc := NewLayerConnection(*l, toLayer, ltype, weights)
+	lc := NewLayerConnection(l, toLayer, ltype, weights)
 	return &lc
 }
 
@@ -72,6 +70,13 @@ func (l *Layer) Project(toLayer Layer, ltype LayerType, weights []float64) *Laye
 func (l *Layer) Gate() {}
 
 // isConnected returns true if this layer is connected to the target layer already.
-func (l *Layer) isConnected(targetLayer Layer) bool {
-	return false // TODO
+func (l *Layer) isConnected(targetLayer *Layer) bool {
+	for _, neuron := range l.List {
+		for _, target := range targetLayer.List {
+			if neuron.ConnectionForNeuron(&target) != nil {
+				return true
+			}
+		}
+	}
+	return false
 }

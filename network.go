@@ -2,9 +2,9 @@ package automata
 
 // Network represents an arbitrary artificial neural network.
 type Network struct {
-	Input  Layer
+	Input  *Layer
 	Hidden []Layer
-	Output Layer
+	Output *Layer
 }
 
 // Activate the network with the given neuron, feeding forward to produce an output.
@@ -36,7 +36,13 @@ func (n *Network) Propagate(rate float64, target []float64) error {
 	return nil
 }
 
-func (n *Network) Project() {}
+func (n *Network) ProjectLayer(layer *Layer, ltype LayerType, weights []float64) {
+	n.Output.Project(layer, ltype, weights)
+}
+
+func (n *Network) ProjectNetwork(network *Network, ltype LayerType, weights []float64) {
+	n.Output.Project(network.Input, ltype, weights)
+}
 
 // TODO:
 // - Gate

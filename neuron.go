@@ -176,6 +176,19 @@ func (n *Neuron) Project(targetNeuron *Neuron, weight *float64) *Connection {
 	}
 }
 
+// ConnectionForNeuron returns the connection between the two neurons or nil if there is no connection.
+func (n *Neuron) ConnectionForNeuron(target *Neuron) *Connection {
+	c := n.Projected.getConnectionForNeuron(target)
+	if c != nil {
+		return c
+	}
+	c = n.Inputs.getConnectionForNeuron(target)
+	if c != nil {
+		return c
+	}
+	return n.Gated.getConnectionForNeuron(target)
+}
+
 // learn by adjusting weights.
 func (n *Neuron) learn(rate float64) {
 	for connID, conn := range n.Inputs {

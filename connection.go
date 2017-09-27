@@ -48,15 +48,15 @@ const (
 // LayerConnection represents a connection between two layers.
 type LayerConnection struct {
 	ID          ConnID
-	From        Layer
-	To          Layer
+	From        *Layer
+	To          *Layer
 	Type        LayerType
 	Weights     []float64
 	Connections ConnMap
 	List        []*Connection
 }
 
-func NewLayerConnection(from, to Layer, ltype LayerType, weights []float64) LayerConnection {
+func NewLayerConnection(from, to *Layer, ltype LayerType, weights []float64) LayerConnection {
 	if ltype == LayerTypeAuto {
 		if &from == &to {
 			ltype = LayerTypeOneToOne
