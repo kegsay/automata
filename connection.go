@@ -1,6 +1,7 @@
 package automata
 
 import "fmt"
+import "math/rand"
 
 var connCount = 0
 
@@ -16,12 +17,16 @@ type Connection struct {
 	Gain   float64
 }
 
-func NewConnection(from, to Neuron, weight float64) *Connection {
+func NewConnection(from, to *Neuron, weight *float64) *Connection {
+	if weight == nil {
+		w := (rand.Float64() * 0.2) - 0.1 // random weight between -0.1 and +0.1
+		weight = &w
+	}
 	return &Connection{
 		ID:     connUID(),
-		From:   &from,
-		To:     &to,
-		Weight: weight,
+		From:   from,
+		To:     to,
+		Weight: *weight,
 	}
 }
 
@@ -51,12 +56,11 @@ type LayerConnection struct {
 	From        *Layer
 	To          *Layer
 	Type        LayerType
-	Weights     []float64
 	Connections ConnMap
 	List        []*Connection
 }
 
-func NewLayerConnection(from, to *Layer, ltype LayerType, weights []float64) LayerConnection {
+func NewLayerConnection(from, to *Layer, ltype LayerType) LayerConnection {
 	if ltype == LayerTypeAuto {
 		if &from == &to {
 			ltype = LayerTypeOneToOne
@@ -76,7 +80,7 @@ func NewLayerConnection(from, to *Layer, ltype LayerType, weights []float64) Lay
 			if i < len(to.List) {
 				toNeuron = &to.List[i]
 			}
-			conn := neuron.Project(toNeuron, &weights[0])
+			conn := neuron.Project(toNeuron, nil)
 			connsByID[conn.ID] = conn
 			list = append(list, conn)
 		}
@@ -91,7 +95,7 @@ func NewLayerConnection(from, to *Layer, ltype LayerType, weights []float64) Lay
 				if ltype == LayerTypeAllToElse && &fromNeuron == &toNeuron {
 					continue
 				}
-				conn := fromNeuron.Project(&toNeuron, &weights[0])
+				conn := fromNeuron.Project(&toNeuron, nil)
 				connsByID[conn.ID] = conn
 				list = append(list, conn)
 			}
@@ -105,7 +109,6 @@ func NewLayerConnection(from, to *Layer, ltype LayerType, weights []float64) Lay
 		From:        from,
 		To:          to,
 		Type:        ltype,
-		Weights:     weights,
 		Connections: connsByID,
 		List:        list,
 	}

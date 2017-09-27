@@ -49,7 +49,8 @@ func NewNeuron() Neuron {
 		TraceExtended:    make(map[NeuronID]map[ConnID]float64),
 		TraceInfluences:  make(map[NeuronID]map[ConnID]Connection),
 	}
-	n.Self = NewConnection(n, n, 0) // 0 weight means unconnected
+	w := float64(0)
+	n.Self = NewConnection(&n, &n, &w) // 0 weight means unconnected
 	return n
 }
 
@@ -161,7 +162,7 @@ func (n *Neuron) Project(targetNeuron *Neuron, weight *float64) *Connection {
 		}
 		return conn
 	} else {
-		conn = NewConnection(*n, *targetNeuron, *weight)
+		conn = NewConnection(n, targetNeuron, weight)
 
 		// reference this connection and traces
 		n.Projected[conn.ID] = conn

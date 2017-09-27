@@ -36,12 +36,12 @@ func (n *Network) Propagate(rate float64, target []float64) error {
 	return nil
 }
 
-func (n *Network) ProjectLayer(layer *Layer, ltype LayerType, weights []float64) {
-	n.Output.Project(layer, ltype, weights)
+func (n *Network) ProjectLayer(layer *Layer, ltype LayerType) {
+	n.Output.Project(layer, ltype)
 }
 
-func (n *Network) ProjectNetwork(network *Network, ltype LayerType, weights []float64) {
-	n.Output.Project(network.Input, ltype, weights)
+func (n *Network) ProjectNetwork(network *Network, ltype LayerType) {
+	n.Output.Project(network.Input, ltype)
 }
 
 // TODO:

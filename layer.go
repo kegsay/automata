@@ -58,11 +58,11 @@ func (l *Layer) Propagate(rate float64, target []float64) error {
 }
 
 // Project a connection from this layer to another one.
-func (l *Layer) Project(toLayer *Layer, ltype LayerType, weights []float64) *LayerConnection {
+func (l *Layer) Project(toLayer *Layer, ltype LayerType) *LayerConnection {
 	if l.isConnected(toLayer) {
 		return nil
 	}
-	lc := NewLayerConnection(l, toLayer, ltype, weights)
+	lc := NewLayerConnection(l, toLayer, ltype)
 	return &lc
 }
 
