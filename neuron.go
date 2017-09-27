@@ -1,6 +1,8 @@
 package automata
 
-import "math/rand"
+import (
+	"math/rand"
+)
 
 type NeuronID int64
 
@@ -33,7 +35,7 @@ type Neuron struct {
 
 	TraceEligibility map[ConnID]float64
 	TraceExtended    map[NeuronID]map[ConnID]float64
-	TraceInfluences  map[NeuronID]map[ConnID]Connection
+	TraceInfluences  map[NeuronID]map[ConnID]*Connection
 }
 
 func NewNeuron() Neuron {
@@ -47,7 +49,7 @@ func NewNeuron() Neuron {
 		Gated:            make(ConnMap),
 		TraceEligibility: make(map[ConnID]float64),
 		TraceExtended:    make(map[NeuronID]map[ConnID]float64),
-		TraceInfluences:  make(map[NeuronID]map[ConnID]Connection),
+		TraceInfluences:  make(map[NeuronID]map[ConnID]*Connection),
 	}
 	w := float64(0)
 	n.Self = NewConnection(&n, &n, &w) // 0 weight means unconnected

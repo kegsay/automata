@@ -2,7 +2,7 @@ package automata
 
 type Trainer struct {
 	Network      *Network
-	Rate         float64
+	LearnRate    float64
 	Iterations   int
 	MaxErrorRate float64
 	CostFunction Coster
@@ -16,7 +16,7 @@ type TrainSet struct {
 func (t *Trainer) Train(trainingSet []TrainSet) error {
 	// TODO: Cross-validation support
 	for i := 0; i < t.Iterations; i++ {
-		errorSum, err := t.trainSet(trainingSet, t.Rate, t.CostFunction)
+		errorSum, err := t.trainSet(trainingSet, t.LearnRate, t.CostFunction)
 		if err != nil {
 			return err
 		}

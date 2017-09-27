@@ -1,6 +1,7 @@
 package automata
 
 import (
+	"fmt"
 	"math"
 	"testing"
 )
@@ -20,7 +21,8 @@ func TestANDGate(t *testing.T) {
 	trainer := Trainer{
 		Network:      &network,
 		MaxErrorRate: 0.001,
-		Iterations:   1000,
+		LearnRate:    0.1,
+		Iterations:   100,
 		CostFunction: &MeanSquaredErrorCost{},
 	}
 	err := trainer.Train([]TrainSet{
@@ -48,6 +50,8 @@ func activateNetwork(t *testing.T, network *Network, input, desiredOutput []floa
 	for i, out := range output {
 		if round(out) != desiredOutput[i] {
 			t.Errorf("%v : want %f, got %f (%f)", input, desiredOutput[i], round(out), out)
+		} else {
+			fmt.Println(input, " got ", out)
 		}
 	}
 }
