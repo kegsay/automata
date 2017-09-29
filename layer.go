@@ -4,12 +4,12 @@ import "fmt"
 
 // Layer represents a group of neurons which activate together.
 type Layer struct {
-	List        []Neuron
+	List        []*Neuron
 	ConnectedTo []LayerConnection
 }
 
 func NewLayer(size int) Layer {
-	neurons := make([]Neuron, size)
+	neurons := make([]*Neuron, size)
 	for i := 0; i < size; i++ {
 		neurons[i] = NewNeuron()
 	}
@@ -73,7 +73,7 @@ func (l *Layer) Gate() {}
 func (l *Layer) isConnected(targetLayer *Layer) bool {
 	for _, neuron := range l.List {
 		for _, target := range targetLayer.List {
-			if neuron.ConnectionForNeuron(&target) != nil {
+			if neuron.ConnectionForNeuron(target) != nil {
 				return true
 			}
 		}

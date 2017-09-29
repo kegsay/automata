@@ -27,6 +27,7 @@ func NewConnection(from, to *Neuron, weight *float64) *Connection {
 		From:   from,
 		To:     to,
 		Weight: *weight,
+		Gain:   1,
 	}
 }
 
@@ -78,7 +79,7 @@ func NewLayerConnection(from, to *Layer, ltype LayerType) LayerConnection {
 		for i, neuron := range from.List {
 			var toNeuron *Neuron
 			if i < len(to.List) {
-				toNeuron = &to.List[i]
+				toNeuron = to.List[i]
 			}
 			conn := neuron.Project(toNeuron, nil)
 			connsByID[conn.ID] = conn
@@ -95,7 +96,7 @@ func NewLayerConnection(from, to *Layer, ltype LayerType) LayerConnection {
 				if ltype == LayerTypeAllToElse && &fromNeuron == &toNeuron {
 					continue
 				}
-				conn := fromNeuron.Project(&toNeuron, nil)
+				conn := fromNeuron.Project(toNeuron, nil)
 				connsByID[conn.ID] = conn
 				list = append(list, conn)
 			}

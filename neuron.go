@@ -38,7 +38,7 @@ type Neuron struct {
 	TraceInfluences  map[NeuronID]map[ConnID]*Connection
 }
 
-func NewNeuron() Neuron {
+func NewNeuron() *Neuron {
 	n := Neuron{
 		ID:               neuronUID(),
 		Squash:           &SquashLogistic{},
@@ -53,7 +53,7 @@ func NewNeuron() Neuron {
 	}
 	w := float64(0)
 	n.Self = NewConnection(&n, &n, &w) // 0 weight means unconnected
-	return n
+	return &n
 }
 
 // Activate this neuron with an optional input.
@@ -108,6 +108,7 @@ func (n *Neuron) Activate(input *float64) float64 {
 
 			// Eq. 18
 			xtrace[input.ID] = neuron.Self.Gain*neuron.Self.Weight*xtrace[input.ID] + n.Derivative*n.TraceEligibility[input.ID]*influence
+			n.TraceExtended[neuronID] = xtrace
 		}
 	}
 
@@ -116,7 +117,6 @@ func (n *Neuron) Activate(input *float64) float64 {
 		conn.Gain = n.Activation
 		n.Gated[connID] = conn
 	}
-
 	return n.Activation
 }
 
@@ -141,8 +141,20 @@ func (n *Neuron) Propagate(rate float64, target *float64) {
 
 		n.ErrorProjected = n.Derivative * accumulatedError
 
-		// TODO: Eq. 22: gated error responsibility
-		n.ErrorGated = 0
+		accumulatedError = 0
+		for nid := range n.TraceExtended {
+			var influence float64
+			neuron := n.Neighbours[nid]
+			if neuron.Self.Gater == n {
+				influence = neuron.Old
+			}
+			for cid := range n.TraceInfluences[nid] {
+				influence += n.TraceInfluences[nid][cid].Weight * n.TraceInfluences[nid][cid].From.Activation
+			}
+			// Eq. 22 gated error responsibility
+			accumulatedError += neuron.ErrorResponsibility * influence
+		}
+		n.ErrorGated = n.Derivative * accumulatedError
 
 		n.ErrorResponsibility = n.ErrorProjected + n.ErrorGated
 	}

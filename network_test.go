@@ -22,7 +22,7 @@ func TestANDGate(t *testing.T) {
 		Network:      &network,
 		MaxErrorRate: 0.001,
 		LearnRate:    0.1,
-		Iterations:   100,
+		Iterations:   1000,
 		CostFunction: &MeanSquaredErrorCost{},
 	}
 	err := trainer.Train([]TrainSet{
