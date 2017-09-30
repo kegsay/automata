@@ -1,4 +1,7 @@
-This project is currently a work in progress and is not yet functional.
+[![GoDoc](https://godoc.org/github.com/Kegsay/automata?status.svg)](https://godoc.org/github.com/Kegsay/automata) [![Build Status](https://travis-ci.org/Kegsay/automata.svg?branch=master)](https://travis-ci.org/Kegsay/automata)
+
+
+This project is currently a work in progress. You can create basic functioning neural networks, check the tests to find out more.
 
 ### Aims
 
