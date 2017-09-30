@@ -53,7 +53,8 @@ func (s *SquashIdentity) Squash(x float64, derivate bool) float64 {
 }
 
 // SquashReLU implements the ReLU activation function, which is not subject to the Vanishing
-// Gradient problem.
+// Gradient problem
+// .
 // https://en.wikipedia.org/wiki/Rectifier_(neural_networks)
 type SquashRelu struct{}
 
