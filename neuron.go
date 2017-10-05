@@ -66,6 +66,7 @@ func (n *Neuron) Activate(input *float64) float64 {
 		n.Activation = *input
 		n.Derivative = 0
 		n.Bias = 0
+		// fmt.Println(n.ID, " Activate INPUT NEURON => ", *input)
 		return n.Activation
 	}
 
@@ -117,6 +118,7 @@ func (n *Neuron) Activate(input *float64) float64 {
 		conn.Gain = n.Activation
 		n.Gated[connID] = conn
 	}
+	//fmt.Println(n.ID, " Activate => ", n.Activation, "old=", n.Old, " state=", n.State)
 	return n.Activation
 }
 
@@ -164,6 +166,7 @@ func (n *Neuron) Propagate(rate float64, target *float64) {
 
 func (n *Neuron) Project(targetNeuron *Neuron, weight *float64) *Connection {
 	if targetNeuron == n {
+		// fmt.Println("PROJECT: self", n.ID)
 		n.Self.Weight = 1 // make connection live (1 = connected)
 		return n.Self
 	}
@@ -171,6 +174,7 @@ func (n *Neuron) Project(targetNeuron *Neuron, weight *float64) *Connection {
 	// check if this connection already exists
 	conn := n.Projected.getConnectionForNeuron(targetNeuron)
 	if conn != nil {
+		// fmt.Println("PROJECT: Already found (", n.ID, "to", targetNeuron.ID, ")")
 		if weight != nil {
 			conn.Weight = *weight
 		}
@@ -187,6 +191,7 @@ func (n *Neuron) Project(targetNeuron *Neuron, weight *float64) *Connection {
 			trace := n.TraceExtended[nID]
 			trace[conn.ID] = 0
 		}
+		// fmt.Println("PROJECT: hooked ", n.ID, "to", targetNeuron.ID)
 		return conn
 	}
 }
