@@ -8,9 +8,9 @@ import (
 )
 
 func TestPerceptronXOR(t *testing.T) {
-	perceptron, err := automata.NewPerceptron([]int{2, 3, 1})
+	perceptron, err := automata.NewPerceptronNetwork([]int{2, 3, 1})
 	if err != nil {
-		t.Fatalf("Failed to create NewPerceptron: %s", err.Error())
+		t.Fatalf("Failed to create NewPerceptronNetwork: %s", err.Error())
 	}
 
 	// Train it.
@@ -39,9 +39,9 @@ func TestPerceptronXOR(t *testing.T) {
 }
 
 func TestPerceptronSine(t *testing.T) {
-	perceptron, err := automata.NewPerceptron([]int{1, 12, 1})
+	perceptron, err := automata.NewPerceptronNetwork([]int{1, 12, 1})
 	if err != nil {
-		t.Fatalf("Failed to create NewPerceptron: %s", err.Error())
+		t.Fatalf("Failed to create NewPerceptronNetwork: %s", err.Error())
 	}
 
 	// keep sin output positive
@@ -54,11 +54,11 @@ func TestPerceptronSine(t *testing.T) {
 		Network:      perceptron,
 		MaxErrorRate: 1e-6,
 		LearnRate:    0.2,
-		Iterations:   1000,
+		Iterations:   700,
 		CostFunction: &automata.MeanSquaredErrorCost{},
 	}
 	var ts []automata.TrainSet
-	for i := 0; i < 800; i++ {
+	for i := 0; i < 500; i++ {
 		rads := rand.Float64() * math.Pi * 2 // random radians
 		ts = append(ts, automata.TrainSet{
 			Input:  []float64{rads},

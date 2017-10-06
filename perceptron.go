@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// NewPerceptron creates a new Perceptron with the number of layers equal to the length of the provided slice.
+// NewPerceptronNetwork creates a new Perceptron with the number of layers equal to the length of the provided slice.
 // The elements in the slice determine the size of each layer. The first element is the input layer. The last
 // element is the output layer. The inbetween elements are hidden layers. The length of the slice must be at
 // least 3 to accomodate an input, hidden and output layer. For example:
@@ -15,7 +15,7 @@ import (
 //   //  - 4 neurons on the second hidden layer
 //   //  - 1 neuron on the output layer
 //   perceptron := automata.NewPerceptron([]int{2,3,4,1})
-func NewPerceptron(sizesOfLayers []int) (*Network, error) {
+func NewPerceptronNetwork(sizesOfLayers []int) (*Network, error) {
 	if len(sizesOfLayers) < 3 {
 		return nil, fmt.Errorf("NewPerceptron: sizesOfLayers must be at least 3, got %d", len(sizesOfLayers))
 	}

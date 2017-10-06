@@ -1,7 +1,7 @@
 package automata
 
 type Trainer struct {
-	Network      *Network
+	Network      Networker
 	LearnRate    float64
 	Iterations   int
 	MaxErrorRate float64

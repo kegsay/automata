@@ -1,5 +1,12 @@
 package automata
 
+// Networker represents an abstraction of a Network, which is used primarily with the Trainer to accommodate
+// different Network structs such as Hopfield.
+type Networker interface {
+	Activate(input []float64) ([]float64, error)
+	Propagate(rate float64, target []float64) error
+}
+
 // Network represents an arbitrary artificial neural network.
 type Network struct {
 	Input  *Layer
