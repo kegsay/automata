@@ -67,7 +67,46 @@ func (l *Layer) Project(toLayer *Layer, ltype LayerType) *LayerConnection {
 }
 
 // Gate a connection between two layers.
-func (l *Layer) Gate() {}
+func (l *Layer) Gate(conn *LayerConnection, gateType GateType) error {
+	switch gateType {
+	case GateTypeInput:
+		if len(conn.To.List) != len(l.List) {
+			return fmt.Errorf("Cannot gate connection to layer - neuron count mismatch, %d != %d", len(conn.To.List), len(l.List))
+		}
+		for i, neuron := range conn.To.List {
+			gater := l.List[i]
+			for _, gated := range neuron.Inputs {
+				if _, ok := conn.Connections[gated.ID]; ok {
+					gater.Gate(gated)
+				}
+			}
+		}
+	case GateTypeOutput:
+		if len(conn.From.List) != len(l.List) {
+			return fmt.Errorf("Cannot gate connection to layer - neuron count mismatch, %d != %d", len(conn.From.List), len(l.List))
+		}
+		for i, neuron := range conn.From.List {
+			gater := l.List[i]
+			for _, gated := range neuron.Projected {
+				if _, ok := conn.Connections[gated.ID]; ok {
+					gater.Gate(gated)
+				}
+			}
+		}
+	case GateTypeOneToOne:
+		if len(conn.List) != len(l.List) {
+			return fmt.Errorf("Cannot gate connection to layer - neuron count mismatch, %d != %d", len(conn.List), len(l.List))
+		}
+		for i := range l.List {
+			gater := l.List[i]
+			gated := conn.List[i]
+			gater.Gate(gated)
+		}
+	default:
+		return fmt.Errorf("unknown GateType: %d", gateType)
+	}
+	return nil
+}
 
 // isConnected returns true if this layer is connected to the target layer already.
 func (l *Layer) isConnected(targetLayer *Layer) bool {

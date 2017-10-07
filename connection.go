@@ -3,6 +3,15 @@ package automata
 import "fmt"
 import "math/rand"
 
+type LayerType int
+
+const (
+	LayerTypeAuto LayerType = iota
+	LayerTypeAllToAll
+	LayerTypeOneToOne
+	LayerTypeAllToElse
+)
+
 var connCount = 0
 
 type ConnID int64
@@ -41,15 +50,6 @@ func (m ConnMap) getConnectionForNeuron(n *Neuron) *Connection {
 	}
 	return nil
 }
-
-type LayerType int
-
-const (
-	LayerTypeAuto LayerType = iota
-	LayerTypeAllToAll
-	LayerTypeOneToOne
-	LayerTypeAllToElse
-)
 
 // LayerConnection represents a connection between two layers.
 type LayerConnection struct {

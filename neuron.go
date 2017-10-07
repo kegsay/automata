@@ -196,6 +196,20 @@ func (n *Neuron) Project(targetNeuron *Neuron, weight *float64) *Connection {
 	}
 }
 
+func (n *Neuron) Gate(conn *Connection) {
+	n.Gated[conn.ID] = conn
+	if _, ok := n.TraceExtended[conn.To.ID]; !ok {
+		n.Neighbours[conn.To.ID] = conn.To
+		n.TraceExtended[conn.To.ID] = make(map[ConnID]float64)
+	}
+
+	if n.TraceInfluences[conn.To.ID] == nil {
+		n.TraceInfluences[conn.To.ID] = make(map[ConnID]*Connection)
+	}
+	n.TraceInfluences[conn.To.ID][conn.ID] = conn
+	conn.Gater = n
+}
+
 // ConnectionForNeuron returns the connection between the two neurons or nil if there is no connection.
 func (n *Neuron) ConnectionForNeuron(target *Neuron) *Connection {
 	c := n.Projected.getConnectionForNeuron(target)

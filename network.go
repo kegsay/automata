@@ -51,5 +51,6 @@ func (n *Network) ProjectNetwork(network *Network, ltype LayerType) {
 	n.Output.Project(network.Input, ltype)
 }
 
-// TODO:
-// - Gate
+func (n *Network) Gate(conn *LayerConnection, gateType GateType) {
+	n.Output.Gate(conn, gateType)
+}
