@@ -8,6 +8,7 @@ import (
 )
 
 func TestPerceptronXOR(t *testing.T) {
+	rand.Seed(1) // consistent seed for consistent errors!
 	perceptron, err := automata.NewPerceptronNetwork([]int{2, 3, 1})
 	if err != nil {
 		t.Fatalf("Failed to create NewPerceptronNetwork: %s", err.Error())
