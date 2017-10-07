@@ -1,7 +1,7 @@
 package automata_test
 
 import (
-	"fmt"
+	"github.com/kegsay/automata"
 	"math/rand"
 	"strings"
 	"testing"
@@ -14,7 +14,95 @@ import (
 // contained in this repository.
 func TestLSTMERG(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
-	fmt.Println(generateERG(100))
+
+	// enough memory cells for each node in the ERG
+	lstm := automata.NewLSTM(7, []int{6, 6, 6}, 7)
+
+	ergTrainingStrings := make([]string, 12)
+	for i := 0; i < 12; i++ {
+		ergTrainingStrings[i] = generateERG(60)
+	}
+
+	trainer := automata.Trainer{
+		Network:      lstm,
+		MaxErrorRate: 0.01,
+		LearnRate:    0.5,
+		Iterations:   5,
+		CostFunction: &automata.MeanSquaredErrorCost{},
+	}
+	// The point is for the ANN to predict the next letter in the ERG, an to know when the sequence
+	// has been restarted (reached end and started a new one)
+	ergTrain := strings.Join(ergTrainingStrings, "")
+	trainingSet := make([]automata.TrainSet, len(ergTrain)-1)
+	for i := 0; i < len(ergTrain)-1; i++ {
+		trainingSet[i] = automata.TrainSet{
+			Input:  letterToInput(t, rune(ergTrain[i])),
+			Output: letterToInput(t, rune(ergTrain[i+1])),
+		}
+	}
+	err := trainer.Train(trainingSet)
+	if err != nil {
+		t.Fatalf("trainer.Train threw error: %s", err.Error())
+	}
+
+}
+
+// Convert the letter into a suitable form for consumption in the network. Basically it's a massive set of flags,
+// one for each letter. Flag is on if letter is selected.
+func letterToInput(t *testing.T, letter rune) []float64 {
+	switch letter {
+	case 'B':
+		return []float64{1, 0, 0, 0, 0, 0, 0}
+	case 'T':
+		return []float64{0, 1, 0, 0, 0, 0, 0}
+	case 'X':
+		return []float64{0, 0, 1, 0, 0, 0, 0}
+	case 'P':
+		return []float64{0, 0, 0, 1, 0, 0, 0}
+	case 'V':
+		return []float64{0, 0, 0, 0, 1, 0, 0}
+	case 'S':
+		return []float64{0, 0, 0, 0, 0, 1, 0}
+	case 'E':
+		return []float64{0, 0, 0, 0, 0, 0, 1}
+	default:
+		t.Fatalf("Invalid letter: %s", letter)
+	}
+	return nil
+}
+
+// convert the output back into a letter
+func outputToLetter(output []float64) string {
+	flagIndex := -1
+	for i := range output {
+		val := round(output[i])
+		if val == 0 {
+			continue
+		}
+		if flagIndex != -1 {
+			// multiple flags were set, which makes no sense. Return a marker to indicate this.
+			return "1"
+		}
+		flagIndex = i
+	}
+
+	switch flagIndex {
+	case 0:
+		return "B"
+	case 1:
+		return "T"
+	case 2:
+		return "X"
+	case 3:
+		return "P"
+	case 4:
+		return "V"
+	case 5:
+		return "S"
+	case 6:
+		return "E"
+	}
+	return "0" // no flags set
 }
 
 // Numbers are states in the finite state machine.

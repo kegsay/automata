@@ -117,12 +117,16 @@ func (l *Layer) SetBias(bias float64) {
 
 // isConnected returns true if this layer is connected to the target layer already.
 func (l *Layer) isConnected(targetLayer *Layer) bool {
+	connCount := 0
 	for _, neuron := range l.List {
 		for _, target := range targetLayer.List {
 			if neuron.ConnectionForNeuron(target) != nil {
-				return true
+				connCount += 1
 			}
 		}
+	}
+	if connCount == (len(l.List) * len(targetLayer.List)) {
+		return true // all to all layer
 	}
 	return false
 }
