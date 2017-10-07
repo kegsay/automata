@@ -108,6 +108,13 @@ func (l *Layer) Gate(conn *LayerConnection, gateType GateType) error {
 	return nil
 }
 
+// SetBias sets the bias of all neurons in this layer to the given value.
+func (l *Layer) SetBias(bias float64) {
+	for i := range l.List {
+		l.List[i].Bias = bias
+	}
+}
+
 // isConnected returns true if this layer is connected to the target layer already.
 func (l *Layer) isConnected(targetLayer *Layer) bool {
 	for _, neuron := range l.List {
