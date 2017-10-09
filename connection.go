@@ -63,7 +63,7 @@ type LayerConnection struct {
 
 func NewLayerConnection(from, to *Layer, ltype LayerType) LayerConnection {
 	if ltype == LayerTypeAuto {
-		if &from == &to {
+		if from == to {
 			ltype = LayerTypeOneToOne
 		} else {
 			ltype = LayerTypeAllToAll

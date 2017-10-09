@@ -1,6 +1,8 @@
 package automata
 
-import "math"
+import (
+	"math"
+)
 
 // Coster defines a cost function for use with the Trainer.
 type Coster interface {

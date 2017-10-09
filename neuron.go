@@ -146,7 +146,7 @@ func (n *Neuron) Propagate(rate float64, target *float64) {
 		accumulatedError = 0
 		for nid := range n.TraceExtended {
 			var influence float64
-			neuron := n.Neighbours[nid]
+			neuron := n.Neighbours[nid] // gated neuron
 			if neuron.Self.Gater == n {
 				influence = neuron.Old
 			}
@@ -158,6 +158,7 @@ func (n *Neuron) Propagate(rate float64, target *float64) {
 		}
 		n.ErrorGated = n.Derivative * accumulatedError
 
+		// Eq. 23
 		n.ErrorResponsibility = n.ErrorProjected + n.ErrorGated
 	}
 
@@ -201,6 +202,9 @@ func (n *Neuron) Gate(conn *Connection) {
 	if _, ok := n.TraceExtended[conn.To.ID]; !ok {
 		n.Neighbours[conn.To.ID] = conn.To
 		n.TraceExtended[conn.To.ID] = make(map[ConnID]float64)
+		for _, input := range n.Inputs {
+			n.TraceExtended[conn.To.ID][input.ID] = 0
+		}
 	}
 
 	if n.TraceInfluences[conn.To.ID] == nil {
@@ -212,6 +216,9 @@ func (n *Neuron) Gate(conn *Connection) {
 
 // ConnectionForNeuron returns the connection between the two neurons or nil if there is no connection.
 func (n *Neuron) ConnectionForNeuron(target *Neuron) *Connection {
+	if target == n && n.Self.Weight != 0 {
+		return target.Self
+	}
 	c := n.Projected.getConnectionForNeuron(target)
 	if c != nil {
 		return c
