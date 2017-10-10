@@ -1,4 +1,6 @@
 language: go
 go:
  - 1.8
-script: go build && go test
+install:
+ - go get github.com/golang/lint/golint
+script: go build && go test && golint . && go tool vet --shadow --all .
