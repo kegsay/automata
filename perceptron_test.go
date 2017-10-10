@@ -1,7 +1,7 @@
 package automata_test
 
 import (
-	"github.com/kegsay/automata"
+	"github.com/Kegsay/automata"
 	"math"
 	"math/rand"
 	"testing"
