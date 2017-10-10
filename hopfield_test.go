@@ -1,7 +1,7 @@
 package automata_test
 
 import (
-	"github.com/kegsay/automata"
+	"github.com/Kegsay/automata"
 	"strings"
 	"testing"
 )
@@ -154,7 +154,7 @@ func imageToInput(t *testing.T, img string) []float64 {
 		} else if img[i] == '1' {
 			set[i] = float64(1)
 		} else {
-			t.Fatalf("imageToTrainSet: bad test image char: %s", img[i])
+			t.Fatalf("imageToTrainSet: bad test image char: %q", img[i])
 		}
 	}
 	return set
