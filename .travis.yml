@@ -3,4 +3,7 @@ go:
  - 1.8
 install:
  - go get github.com/golang/lint/golint
-script: go build && go test && golint . && go tool vet --shadow --all .
+ - go get github.com/mattn/goveralls
+script:
+ - go build && go test && golint . && go tool vet --shadow --all .
+ - $HOME/gopath/bin/goveralls -service=travis-ci
