@@ -1,4 +1,4 @@
-[![GoDoc](https://godoc.org/github.com/Kegsay/automata?status.svg)](https://godoc.org/github.com/Kegsay/automata) [![Build Status](https://travis-ci.org/Kegsay/automata.svg?branch=master)](https://travis-ci.org/Kegsay/automata)
+[![GoDoc](https://godoc.org/github.com/Kegsay/automata?status.svg)](https://godoc.org/github.com/Kegsay/automata) [![Build Status](https://travis-ci.org/Kegsay/automata.svg?branch=master)](https://travis-ci.org/Kegsay/automata) [![Coverage Status](https://coveralls.io/repos/github/Kegsay/automata/badge.svg)](https://coveralls.io/github/Kegsay/automata)
 
 
 This project is currently a work in progress. You can create basic functioning neural networks (hopfield and perceptrons), check the tests to find out more.
