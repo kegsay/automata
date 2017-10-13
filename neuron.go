@@ -20,7 +20,7 @@ type Neuron struct {
 
 	Inputs    []ConnID
 	Projected []ConnID
-	Gated     ConnMap
+	Gated     []ConnID
 
 	ErrorResponsibility float64
 	ErrorProjected      float64
@@ -35,7 +35,6 @@ func NewNeuron() *Neuron {
 	n := Neuron{
 		Squash:           &SquashLogistic{},
 		Bias:             (rand.Float64() / 2) - 0.25, // Bias range from -0.25 ~ 0.25 initially
-		Gated:            make(ConnMap),
 		TraceEligibility: make(map[ConnID]float64),
 		TraceExtended:    make(map[NeuronID]map[ConnID]float64),
 		TraceInfluences:  make(map[NeuronID][]ConnID),
@@ -108,9 +107,10 @@ func (n *Neuron) Activate(input *float64) float64 {
 	}
 
 	// Update gated connection gains
-	for connID, conn := range n.Gated {
+	for _, connID := range n.Gated {
+		conn := GlobalLookupTable.GetConnection(connID)
 		conn.Gain = n.Activation
-		n.Gated[connID] = conn
+		GlobalLookupTable.SetConnectionWithID(connID, conn)
 	}
 	//fmt.Println(n.ID, " Activate => ", n.Activation, "old=", n.Old, " state=", n.State)
 	return n.Activation
@@ -202,7 +202,7 @@ func (n *Neuron) Project(targetNeuron *Neuron, weight *float64) *Connection {
 }
 
 func (n *Neuron) Gate(conn *Connection) {
-	n.Gated[conn.ID] = conn
+	n.Gated = append(n.Gated, conn.ID)
 	if _, ok := n.TraceExtended[conn.To.ID]; !ok {
 		n.Neighbours = append(n.Neighbours, conn.To.ID)
 		n.TraceExtended[conn.To.ID] = make(map[ConnID]float64)
@@ -245,7 +245,13 @@ func (n *Neuron) ConnectionForNeuron(target *Neuron) *Connection {
 		}
 	}
 
-	return n.Gated.getConnectionForNeuron(target)
+	for _, cid := range n.Gated {
+		conn := GlobalLookupTable.GetConnection(cid)
+		if conn.From == target || conn.To == target {
+			return conn
+		}
+	}
+	return nil
 }
 
 // learn by adjusting weights.
