@@ -19,7 +19,7 @@ type LookupTable struct {
 	Connections []*Connection
 }
 
-var GlobalLookupTable = &LookupTable{}
+var GlobalLookupTable = &LookupTable{} // TODO: Dependency inject this
 
 // NewLookupTable creates a new LookupTable. There are no existing mappings initially.
 func NewLookupTable() *LookupTable {
@@ -45,4 +45,25 @@ func (t *LookupTable) GetNeuron(id NeuronID) *Neuron {
 		return nil
 	}
 	return t.Neurons[id]
+}
+
+func (t *LookupTable) SetConnection(conn *Connection) ConnID {
+	t.Connections = append(t.Connections, conn)
+	return ConnID(len(t.Connections) - 1)
+}
+
+func (t *LookupTable) SetConnectionWithID(id ConnID, conn *Connection) {
+	if int(id) > (len(t.Connections) - 1) {
+		// pad out the slice
+		diff := int(id) - (len(t.Connections) - 1)
+		t.Connections = append(t.Connections, make([]*Connection, diff)...)
+	}
+	t.Connections[id] = conn
+}
+
+func (t *LookupTable) GetConnection(id ConnID) *Connection {
+	if int(id) > (len(t.Connections) - 1) {
+		return nil
+	}
+	return t.Connections[id]
 }

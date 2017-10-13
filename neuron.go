@@ -28,7 +28,7 @@ type Neuron struct {
 
 	TraceEligibility map[ConnID]float64
 	TraceExtended    map[NeuronID]map[ConnID]float64
-	TraceInfluences  map[NeuronID]map[ConnID]*Connection
+	TraceInfluences  map[NeuronID][]ConnID
 }
 
 func NewNeuron() *Neuron {
@@ -40,7 +40,7 @@ func NewNeuron() *Neuron {
 		Gated:            make(ConnMap),
 		TraceEligibility: make(map[ConnID]float64),
 		TraceExtended:    make(map[NeuronID]map[ConnID]float64),
-		TraceInfluences:  make(map[NeuronID]map[ConnID]*Connection),
+		TraceInfluences:  make(map[NeuronID][]ConnID),
 	}
 	id := GlobalLookupTable.SetNeuron(&n)
 	n.ID = id
@@ -85,7 +85,8 @@ func (n *Neuron) Activate(input *float64) float64 {
 			influence = neuron.Old
 		}
 
-		for _, incoming := range n.TraceInfluences[neuron.ID] {
+		for _, cid := range n.TraceInfluences[neuron.ID] {
+			incoming := GlobalLookupTable.GetConnection(cid)
 			influence += incoming.Weight * incoming.From.Activation
 		}
 		influences[neuron.ID] = influence
@@ -143,8 +144,9 @@ func (n *Neuron) Propagate(rate float64, target *float64) {
 			if neuron.Self.Gater == n {
 				influence = neuron.Old
 			}
-			for cid := range n.TraceInfluences[nid] {
-				influence += n.TraceInfluences[nid][cid].Weight * n.TraceInfluences[nid][cid].From.Activation
+			for _, cid := range n.TraceInfluences[nid] {
+				conn := GlobalLookupTable.GetConnection(cid)
+				influence += conn.Weight * conn.From.Activation
 			}
 			// Eq. 22 gated error responsibility
 			accumulatedError += neuron.ErrorResponsibility * influence
@@ -201,9 +203,11 @@ func (n *Neuron) Gate(conn *Connection) {
 	}
 
 	if n.TraceInfluences[conn.To.ID] == nil {
-		n.TraceInfluences[conn.To.ID] = make(map[ConnID]*Connection)
+		n.TraceInfluences[conn.To.ID] = make([]ConnID, 1)
 	}
-	n.TraceInfluences[conn.To.ID][conn.ID] = conn
+	arr := n.TraceInfluences[conn.To.ID]
+	arr = append(arr, conn.ID)
+	n.TraceInfluences[conn.To.ID] = arr
 	conn.Gater = n
 }
 

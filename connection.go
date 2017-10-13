@@ -31,13 +31,15 @@ func NewConnection(from, to *Neuron, weight *float64) *Connection {
 		w := (rand.Float64() * 0.2) - 0.1 // random weight between -0.1 and +0.1
 		weight = &w
 	}
-	return &Connection{
-		ID:     connUID(),
+	conn := &Connection{
 		From:   from,
 		To:     to,
 		Weight: *weight,
 		Gain:   1,
 	}
+	id := GlobalLookupTable.SetConnection(conn)
+	conn.ID = id
+	return conn
 }
 
 type ConnMap map[ConnID]*Connection
