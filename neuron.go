@@ -6,13 +6,6 @@ import (
 
 type NeuronID int64
 
-var neuronCount = 0
-
-func neuronUID() NeuronID {
-	neuronCount += 1
-	return NeuronID(neuronCount)
-}
-
 // Neuron represents a base unit of work in a neural network.
 type Neuron struct {
 	ID         NeuronID
@@ -23,7 +16,7 @@ type Neuron struct {
 	Self       *Connection
 	Squash     Squasher
 	Bias       float64
-	Neighbours NeuronMap
+	Neighbours []NeuronID
 
 	Inputs    ConnMap
 	Projected ConnMap
@@ -40,10 +33,8 @@ type Neuron struct {
 
 func NewNeuron() *Neuron {
 	n := Neuron{
-		ID:               neuronUID(),
 		Squash:           &SquashLogistic{},
 		Bias:             (rand.Float64() / 2) - 0.25, // Bias range from -0.25 ~ 0.25 initially
-		Neighbours:       make(NeuronMap, 1),
 		Inputs:           make(ConnMap),
 		Projected:        make(ConnMap),
 		Gated:            make(ConnMap),
@@ -51,6 +42,8 @@ func NewNeuron() *Neuron {
 		TraceExtended:    make(map[NeuronID]map[ConnID]float64),
 		TraceInfluences:  make(map[NeuronID]map[ConnID]*Connection),
 	}
+	id := GlobalLookupTable.SetNeuron(&n)
+	n.ID = id
 	w := float64(0)
 	n.Self = NewConnection(&n, &n, &w) // 0 weight means unconnected
 	return &n
@@ -86,7 +79,7 @@ func (n *Neuron) Activate(input *float64) float64 {
 	// update traces
 	influences := make(map[NeuronID]float64)
 	for neuronID := range n.TraceExtended {
-		neuron := n.Neighbours.Get(neuronID)
+		neuron := GlobalLookupTable.GetNeuron(neuronID)
 		var influence float64
 		if neuron.Self.Gater == n {
 			influence = neuron.Old
@@ -104,7 +97,7 @@ func (n *Neuron) Activate(input *float64) float64 {
 
 		for neuronID := range n.TraceExtended {
 			xtrace := n.TraceExtended[neuronID]
-			neuron := n.Neighbours.Get(neuronID)
+			neuron := GlobalLookupTable.GetNeuron(neuronID)
 			influence := influences[neuronID]
 
 			// Eq. 18
@@ -146,7 +139,7 @@ func (n *Neuron) Propagate(rate float64, target *float64) {
 		accumulatedError = 0
 		for nid := range n.TraceExtended {
 			var influence float64
-			neuron := n.Neighbours.Get(nid) // gated neuron
+			neuron := GlobalLookupTable.GetNeuron(nid) // gated neuron
 			if neuron.Self.Gater == n {
 				influence = neuron.Old
 			}
@@ -185,7 +178,7 @@ func (n *Neuron) Project(targetNeuron *Neuron, weight *float64) *Connection {
 
 		// reference this connection and traces
 		n.Projected[conn.ID] = conn
-		n.Neighbours.Set(n, targetNeuron.ID, targetNeuron)
+		n.Neighbours = append(n.Neighbours, targetNeuron.ID)
 		targetNeuron.Inputs[conn.ID] = conn
 		targetNeuron.TraceEligibility[conn.ID] = 0
 		for nID := range n.TraceExtended {
@@ -200,7 +193,7 @@ func (n *Neuron) Project(targetNeuron *Neuron, weight *float64) *Connection {
 func (n *Neuron) Gate(conn *Connection) {
 	n.Gated[conn.ID] = conn
 	if _, ok := n.TraceExtended[conn.To.ID]; !ok {
-		n.Neighbours.Set(n, conn.To.ID, conn.To)
+		n.Neighbours = append(n.Neighbours, conn.To.ID)
 		n.TraceExtended[conn.To.ID] = make(map[ConnID]float64)
 		for _, input := range n.Inputs {
 			n.TraceExtended[conn.To.ID][input.ID] = 0
@@ -236,7 +229,7 @@ func (n *Neuron) learn(rate float64) {
 		// Eq. 24
 		gradient := n.ErrorProjected * n.TraceEligibility[conn.ID]
 		for neuronID := range n.TraceExtended {
-			neuron := n.Neighbours.Get(neuronID)
+			neuron := GlobalLookupTable.GetNeuron(neuronID)
 			gradient += neuron.ErrorResponsibility * n.TraceExtended[neuronID][conn.ID]
 		}
 
