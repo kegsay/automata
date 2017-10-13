@@ -19,7 +19,7 @@ type Neuron struct {
 	Neighbours []NeuronID
 
 	Inputs    []ConnID
-	Projected ConnMap
+	Projected []ConnID
 	Gated     ConnMap
 
 	ErrorResponsibility float64
@@ -35,7 +35,6 @@ func NewNeuron() *Neuron {
 	n := Neuron{
 		Squash:           &SquashLogistic{},
 		Bias:             (rand.Float64() / 2) - 0.25, // Bias range from -0.25 ~ 0.25 initially
-		Projected:        make(ConnMap),
 		Gated:            make(ConnMap),
 		TraceEligibility: make(map[ConnID]float64),
 		TraceExtended:    make(map[NeuronID]map[ConnID]float64),
@@ -132,7 +131,8 @@ func (n *Neuron) Propagate(rate float64, target *float64) {
 	} else {
 		// Eq. 21: error responsibilities from all the connections projected from this neuron
 		var accumulatedError float64
-		for _, conn := range n.Projected {
+		for _, connID := range n.Projected {
+			conn := GlobalLookupTable.GetConnection(connID)
 			accumulatedError += conn.To.ErrorResponsibility * conn.Gain * conn.Weight
 		}
 
@@ -169,7 +169,15 @@ func (n *Neuron) Project(targetNeuron *Neuron, weight *float64) *Connection {
 	}
 
 	// check if this connection already exists
-	conn := n.Projected.getConnectionForNeuron(targetNeuron)
+	var conn *Connection
+	for _, cid := range n.Projected {
+		projectedConn := GlobalLookupTable.GetConnection(cid)
+		if projectedConn.From == targetNeuron || projectedConn.To == targetNeuron {
+			conn = projectedConn
+			break
+		}
+	}
+
 	if conn != nil {
 		// fmt.Println("PROJECT: Already found (", n.ID, "to", targetNeuron.ID, ")")
 		if weight != nil {
@@ -180,7 +188,7 @@ func (n *Neuron) Project(targetNeuron *Neuron, weight *float64) *Connection {
 		conn = NewConnection(n, targetNeuron, weight)
 
 		// reference this connection and traces
-		n.Projected[conn.ID] = conn
+		n.Projected = append(n.Projected, conn.ID)
 		n.Neighbours = append(n.Neighbours, targetNeuron.ID)
 		targetNeuron.Inputs = append(targetNeuron.Inputs, conn.ID)
 		targetNeuron.TraceEligibility[conn.ID] = 0
@@ -218,7 +226,14 @@ func (n *Neuron) ConnectionForNeuron(target *Neuron) *Connection {
 	if target == n && n.Self.Weight != 0 {
 		return target.Self
 	}
-	c := n.Projected.getConnectionForNeuron(target)
+	var c *Connection
+	for _, cid := range n.Projected {
+		conn := GlobalLookupTable.GetConnection(cid)
+		if conn.From == target || conn.To == target {
+			c = conn
+			break
+		}
+	}
 	if c != nil {
 		return c
 	}

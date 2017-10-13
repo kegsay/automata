@@ -88,7 +88,8 @@ func (l *Layer) Gate(conn *LayerConnection, gateType GateType) error {
 		}
 		for i, neuron := range conn.From.List {
 			gater := l.List[i]
-			for _, gated := range neuron.Projected {
+			for _, gatedID := range neuron.Projected {
+				gated := GlobalLookupTable.GetConnection(gatedID)
 				if _, ok := conn.Connections[gated.ID]; ok {
 					gater.Gate(gated)
 				}
