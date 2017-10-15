@@ -42,24 +42,13 @@ func NewConnection(from, to *Neuron, weight *float64) *Connection {
 	return conn
 }
 
-type ConnMap map[ConnID]*Connection
-
-func (m ConnMap) getConnectionForNeuron(n *Neuron) *Connection {
-	for _, conn := range m {
-		if conn.From == n || conn.To == n {
-			return conn
-		}
-	}
-	return nil
-}
-
 // LayerConnection represents a connection between two layers.
 type LayerConnection struct {
 	ID          ConnID
 	From        *Layer
 	To          *Layer
 	Type        LayerType
-	Connections ConnMap
+	Connections map[ConnID]*Connection
 	List        []*Connection
 }
 
@@ -73,7 +62,7 @@ func NewLayerConnection(from, to *Layer, ltype LayerType) LayerConnection {
 	}
 
 	var list []*Connection
-	connsByID := make(ConnMap)
+	connsByID := make(map[ConnID]*Connection)
 	switch ltype {
 	case LayerTypeOneToOne:
 		// A neuron in position i in the 'from' layer gets projected to the matching neuron in position i
