@@ -24,9 +24,9 @@ func (h *Hopfield) Activate(input []float64) ([]float64, error) {
 // NewHopfieldNetwork creates a new Hopfield network. 'size' dictates the number of input neurons and the number
 // of output neurons. Generally this value should match the number of boolean options in your network
 // e.g. 1 neuron per pixel if recalling images.
-func NewHopfieldNetwork(size int) *Hopfield {
-	inputLayer := NewLayer(size)
-	outputLayer := NewLayer(size)
+func NewHopfieldNetwork(table *LookupTable, size int) *Hopfield {
+	inputLayer := NewLayer(table, size)
+	outputLayer := NewLayer(table, size)
 	inputLayer.Project(&outputLayer, LayerTypeAllToAll)
 	return &Hopfield{
 		Network: Network{

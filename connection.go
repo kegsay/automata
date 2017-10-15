@@ -35,7 +35,7 @@ func NewConnection(from, to *Neuron, weight *float64) *Connection {
 		Weight: *weight,
 		Gain:   1,
 	}
-	id := GlobalLookupTable.SetConnection(conn)
+	id := from.LookupTable.SetConnection(conn)
 	conn.ID = id
 	return conn
 }

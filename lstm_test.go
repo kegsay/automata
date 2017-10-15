@@ -6,7 +6,8 @@ import (
 )
 
 func TestLSTM_ShortTerm(t *testing.T) {
-	lstm := automata.NewLSTM(1, []int{6}, 1)
+	testLookupTable := &automata.LookupTable{}
+	lstm := automata.NewLSTM(testLookupTable, 1, []int{6}, 1)
 	trainer := automata.Trainer{
 		Network:      lstm,
 		MaxErrorRate: 0.001,

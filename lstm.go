@@ -3,20 +3,20 @@ package automata
 // NewLSTM creates a new Long-Short Term Memory network. 'inputSize' is the number of neurons in the input layer.
 // 'outputSize' is the number of neurons in the output layer. The length of 'memoryBlocks' determines how many
 // memory blocks the network will have, whilst the elements determine the number of memory cells in that block.
-func NewLSTM(inputSize int, memoryBlocks []int, outputSize int) *Network {
-	inputLayer := NewLayer(inputSize)
-	outputLayer := NewLayer(outputSize)
+func NewLSTM(table *LookupTable, inputSize int, memoryBlocks []int, outputSize int) *Network {
+	inputLayer := NewLayer(table, inputSize)
+	outputLayer := NewLayer(table, outputSize)
 	var hiddenLayers []Layer
 
 	var prevMemoryBlock *Layer
 	for _, cellSize := range memoryBlocks {
-		inputGate := NewLayer(cellSize)
+		inputGate := NewLayer(table, cellSize)
 		inputGate.SetBias(1)
-		forgetGate := NewLayer(cellSize)
+		forgetGate := NewLayer(table, cellSize)
 		forgetGate.SetBias(1)
-		outputGate := NewLayer(cellSize)
+		outputGate := NewLayer(table, cellSize)
 		outputGate.SetBias(1)
-		memoryCell := NewLayer(cellSize)
+		memoryCell := NewLayer(table, cellSize)
 
 		hiddenLayers = append(hiddenLayers, inputGate)
 		hiddenLayers = append(hiddenLayers, forgetGate)

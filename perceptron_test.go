@@ -8,8 +8,9 @@ import (
 )
 
 func TestPerceptronXOR(t *testing.T) {
+	testLookupTable := &automata.LookupTable{}
 	rand.Seed(1) // consistent seed for consistent errors!
-	perceptron, err := automata.NewPerceptronNetwork([]int{2, 3, 1})
+	perceptron, err := automata.NewPerceptronNetwork(testLookupTable, []int{2, 3, 1})
 	if err != nil {
 		t.Fatalf("Failed to create NewPerceptronNetwork: %s", err.Error())
 	}
@@ -40,7 +41,8 @@ func TestPerceptronXOR(t *testing.T) {
 }
 
 func TestPerceptronSine(t *testing.T) {
-	perceptron, err := automata.NewPerceptronNetwork([]int{1, 12, 1})
+	testLookupTable := &automata.LookupTable{}
+	perceptron, err := automata.NewPerceptronNetwork(testLookupTable, []int{1, 12, 1})
 	if err != nil {
 		t.Fatalf("Failed to create NewPerceptronNetwork: %s", err.Error())
 	}

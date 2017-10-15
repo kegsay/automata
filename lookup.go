@@ -13,13 +13,13 @@ package automata
 // resizing overheads. This means the IDs would be indexes. LookupTable is a massive global
 // slice which provides Neurons/Layers/Connections access to each other via their ID. It's not a true
 // global variable as it is dependency injected at the point of use, allowing the ability of running
-// multiple disconnected networks without sharing the same ID space.
+// multiple disconnected networks without sharing the same ID space. Sharing the same LookupTable
+// for all neurons in a network also lowers memory usage from O(n) to O(1), as each neuron is not
+// having to store its own mini lookup table.
 type LookupTable struct {
 	Neurons     []*Neuron
 	Connections []*Connection
 }
-
-var GlobalLookupTable = &LookupTable{} // TODO: Dependency inject this
 
 // NewLookupTable creates a new LookupTable. There are no existing mappings initially.
 func NewLookupTable() *LookupTable {
