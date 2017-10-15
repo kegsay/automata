@@ -6,15 +6,17 @@ import "fmt"
 type Layer struct {
 	List        []*Neuron
 	ConnectedTo []LayerConnection
+	LookupTable *LookupTable
 }
 
-func NewLayer(size int) Layer {
+func NewLayer(table *LookupTable, size int) Layer {
 	neurons := make([]*Neuron, size)
 	for i := 0; i < size; i++ {
-		neurons[i] = NewNeuron()
+		neurons[i] = NewNeuron(table)
 	}
 	return Layer{
-		List: neurons,
+		List:        neurons,
+		LookupTable: table,
 	}
 }
 
@@ -75,7 +77,8 @@ func (l *Layer) Gate(conn *LayerConnection, gateType GateType) error {
 		}
 		for i, neuron := range conn.To.List {
 			gater := l.List[i]
-			for _, gated := range neuron.Inputs {
+			for _, gatedID := range neuron.Inputs {
+				gated := l.LookupTable.GetConnection(gatedID)
 				if _, ok := conn.Connections[gated.ID]; ok {
 					gater.Gate(gated)
 				}
@@ -87,7 +90,8 @@ func (l *Layer) Gate(conn *LayerConnection, gateType GateType) error {
 		}
 		for i, neuron := range conn.From.List {
 			gater := l.List[i]
-			for _, gated := range neuron.Projected {
+			for _, gatedID := range neuron.Projected {
+				gated := l.LookupTable.GetConnection(gatedID)
 				if _, ok := conn.Connections[gated.ID]; ok {
 					gater.Gate(gated)
 				}

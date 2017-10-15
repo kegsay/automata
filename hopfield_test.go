@@ -52,8 +52,9 @@ const hopfieldImageFive = `
 1111111`
 
 func TestHopfieldImages(t *testing.T) {
+	testLookupTable := &automata.LookupTable{}
 	gridSize := 7
-	hopfield := automata.NewHopfieldNetwork(gridSize * gridSize) // 7x7 grid
+	hopfield := automata.NewHopfieldNetwork(testLookupTable, gridSize*gridSize) // 7x7 grid
 
 	// Train it with "images" of numbers 1 -> 5.
 	trainer := automata.Trainer{

@@ -8,8 +8,9 @@ import (
 
 func TestANDGate(t *testing.T) {
 	// Make the network.
-	inputLayer := automata.NewLayer(2)
-	outputLayer := automata.NewLayer(1)
+	testLookupTable := &automata.LookupTable{}
+	inputLayer := automata.NewLayer(testLookupTable, 2)
+	outputLayer := automata.NewLayer(testLookupTable, 1)
 	inputLayer.Project(&outputLayer, automata.LayerTypeAuto)
 	network := automata.Network{
 		Input:  &inputLayer,
@@ -44,8 +45,9 @@ func TestANDGate(t *testing.T) {
 
 func TestORGate(t *testing.T) {
 	// Make the network.
-	inputLayer := automata.NewLayer(2)
-	outputLayer := automata.NewLayer(1)
+	testLookupTable := &automata.LookupTable{}
+	inputLayer := automata.NewLayer(testLookupTable, 2)
+	outputLayer := automata.NewLayer(testLookupTable, 1)
 	inputLayer.Project(&outputLayer, automata.LayerTypeAuto)
 	network := automata.Network{
 		Input:  &inputLayer,
@@ -80,8 +82,9 @@ func TestORGate(t *testing.T) {
 
 func TestNOTGate(t *testing.T) {
 	// Make the network.
-	inputLayer := automata.NewLayer(1)
-	outputLayer := automata.NewLayer(1)
+	testLookupTable := &automata.LookupTable{}
+	inputLayer := automata.NewLayer(testLookupTable, 1)
+	outputLayer := automata.NewLayer(testLookupTable, 1)
 	inputLayer.Project(&outputLayer, automata.LayerTypeAuto)
 	network := automata.Network{
 		Input:  &inputLayer,

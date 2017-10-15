@@ -12,8 +12,6 @@ const (
 	LayerTypeAllToElse
 )
 
-var connCount = 0
-
 type ConnID int64
 
 // Connection represents a connection between two neurons.
@@ -31,33 +29,23 @@ func NewConnection(from, to *Neuron, weight *float64) *Connection {
 		w := (rand.Float64() * 0.2) - 0.1 // random weight between -0.1 and +0.1
 		weight = &w
 	}
-	return &Connection{
-		ID:     connUID(),
+	conn := &Connection{
 		From:   from,
 		To:     to,
 		Weight: *weight,
 		Gain:   1,
 	}
-}
-
-type ConnMap map[ConnID]*Connection
-
-func (m ConnMap) getConnectionForNeuron(n *Neuron) *Connection {
-	for _, conn := range m {
-		if conn.From == n || conn.To == n {
-			return conn
-		}
-	}
-	return nil
+	id := from.LookupTable.SetConnection(conn)
+	conn.ID = id
+	return conn
 }
 
 // LayerConnection represents a connection between two layers.
 type LayerConnection struct {
-	ID          ConnID
 	From        *Layer
 	To          *Layer
 	Type        LayerType
-	Connections ConnMap
+	Connections map[ConnID]*Connection
 	List        []*Connection
 }
 
@@ -71,7 +59,7 @@ func NewLayerConnection(from, to *Layer, ltype LayerType) LayerConnection {
 	}
 
 	var list []*Connection
-	connsByID := make(ConnMap)
+	connsByID := make(map[ConnID]*Connection)
 	switch ltype {
 	case LayerTypeOneToOne:
 		// A neuron in position i in the 'from' layer gets projected to the matching neuron in position i
@@ -106,7 +94,6 @@ func NewLayerConnection(from, to *Layer, ltype LayerType) LayerConnection {
 	}
 
 	lc := LayerConnection{
-		ID:          connUID(),
 		From:        from,
 		To:          to,
 		Type:        ltype,
@@ -116,9 +103,4 @@ func NewLayerConnection(from, to *Layer, ltype LayerType) LayerConnection {
 	from.ConnectedTo = append(from.ConnectedTo, lc)
 
 	return lc
-}
-
-func connUID() ConnID {
-	connCount += 1
-	return ConnID(connCount)
 }
