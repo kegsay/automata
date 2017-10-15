@@ -21,23 +21,9 @@ type LookupTable struct {
 	Connections []*Connection
 }
 
-// NewLookupTable creates a new LookupTable. There are no existing mappings initially.
-func NewLookupTable() *LookupTable {
-	return &LookupTable{}
-}
-
 func (t *LookupTable) SetNeuron(neuron *Neuron) NeuronID {
 	t.Neurons = append(t.Neurons, neuron)
 	return NeuronID(len(t.Neurons) - 1)
-}
-
-func (t *LookupTable) SetNeuronWithID(id NeuronID, neuron *Neuron) {
-	if int(id) > (len(t.Neurons) - 1) {
-		// pad out the slice
-		diff := int(id) - (len(t.Neurons) - 1)
-		t.Neurons = append(t.Neurons, make([]*Neuron, diff)...)
-	}
-	t.Neurons[id] = neuron
 }
 
 func (t *LookupTable) GetNeuron(id NeuronID) *Neuron {
