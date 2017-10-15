@@ -226,31 +226,17 @@ func (n *Neuron) ConnectionForNeuron(target *Neuron) *Connection {
 	if target == n && n.Self.Weight != 0 {
 		return target.Self
 	}
-	var c *Connection
-	for _, cid := range n.Projected {
-		conn := GlobalLookupTable.GetConnection(cid)
-		if conn.From == target || conn.To == target {
-			c = conn
-			break
-		}
+
+	if c := n.getConnectionForNeuron(n.Projected, target); c != nil {
+		return c
 	}
-	if c != nil {
+	if c := n.getConnectionForNeuron(n.Inputs, target); c != nil {
+		return c
+	}
+	if c := n.getConnectionForNeuron(n.Gated, target); c != nil {
 		return c
 	}
 
-	for _, cid := range n.Inputs {
-		conn := GlobalLookupTable.GetConnection(cid)
-		if conn.From == target || conn.To == target {
-			return conn
-		}
-	}
-
-	for _, cid := range n.Gated {
-		conn := GlobalLookupTable.GetConnection(cid)
-		if conn.From == target || conn.To == target {
-			return conn
-		}
-	}
 	return nil
 }
 
@@ -270,6 +256,16 @@ func (n *Neuron) learn(rate float64) {
 	}
 
 	n.Bias += rate * n.ErrorResponsibility
+}
+
+func (n *Neuron) getConnectionForNeuron(cidList []ConnID, target *Neuron) *Connection {
+	for _, cid := range cidList {
+		conn := GlobalLookupTable.GetConnection(cid)
+		if conn.From == target || conn.To == target {
+			return conn
+		}
+	}
+	return nil
 }
 
 func (n *Neuron) setTraceEligibility(id ConnID, val float64) {
