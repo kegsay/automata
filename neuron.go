@@ -172,15 +172,7 @@ func (n *Neuron) Project(targetNeuron *Neuron, weight *float64) *Connection {
 	}
 
 	// check if this connection already exists
-	var conn *Connection
-	for _, cid := range n.Projected {
-		projectedConn := n.LookupTable.GetConnection(cid)
-		if projectedConn.From == targetNeuron || projectedConn.To == targetNeuron {
-			conn = projectedConn
-			break
-		}
-	}
-
+	conn := n.getConnectionForNeuron(n.Projected, targetNeuron)
 	if conn != nil {
 		// fmt.Println("PROJECT: Already found (", n.ID, "to", targetNeuron.ID, ")")
 		if weight != nil {

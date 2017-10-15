@@ -94,7 +94,6 @@ func NewLayerConnection(from, to *Layer, ltype LayerType) LayerConnection {
 	}
 
 	lc := LayerConnection{
-		//ID:          connUID(),
 		From:        from,
 		To:          to,
 		Type:        ltype,
