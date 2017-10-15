@@ -12,8 +12,6 @@ const (
 	LayerTypeAllToElse
 )
 
-var connCount = 0
-
 type ConnID int64
 
 // Connection represents a connection between two neurons.
@@ -44,7 +42,6 @@ func NewConnection(from, to *Neuron, weight *float64) *Connection {
 
 // LayerConnection represents a connection between two layers.
 type LayerConnection struct {
-	ID          ConnID
 	From        *Layer
 	To          *Layer
 	Type        LayerType
@@ -97,7 +94,7 @@ func NewLayerConnection(from, to *Layer, ltype LayerType) LayerConnection {
 	}
 
 	lc := LayerConnection{
-		ID:          connUID(),
+		//ID:          connUID(),
 		From:        from,
 		To:          to,
 		Type:        ltype,
@@ -107,9 +104,4 @@ func NewLayerConnection(from, to *Layer, ltype LayerType) LayerConnection {
 	from.ConnectedTo = append(from.ConnectedTo, lc)
 
 	return lc
-}
-
-func connUID() ConnID {
-	connCount += 1
-	return ConnID(connCount)
 }
