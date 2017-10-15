@@ -36,7 +36,7 @@ type SquashTanh struct{}
 // Squashes x.
 func (s *SquashTanh) Squash(x float64, derivate bool) float64 {
 	if derivate {
-		return 1 * math.Pow(math.Tanh(x), 2)
+		return 1 - math.Pow(math.Tanh(x), 2)
 	}
 	return math.Tanh(x)
 }
