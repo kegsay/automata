@@ -34,3 +34,21 @@ func (c *CrossEntropyCost) Cost(target, output []float64) (cost float64) {
 	}
 	return
 }
+
+// BinaryCost implement the binary (Zero-One Loss) function
+type BinaryCost struct{}
+
+// Cost of the given output
+func (c *BinaryCost) Cost(target, output []float64) float64 {
+	var misses float64
+	for i := range output {
+		if c.round(target[i]*2) != c.round(output[i]*2) {
+			misses += 1
+		}
+	}
+	return misses
+}
+
+func (c *BinaryCost) round(in float64) float64 {
+	return math.Floor(in + 0.5)
+}
