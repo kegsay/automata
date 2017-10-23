@@ -21,4 +21,16 @@ func (c *MeanSquaredErrorCost) Cost(target, output []float64) (cost float64) {
 	return cost / float64(len(output))
 }
 
-// TODO: Cross-entropy (Eq. 9)
+// CrossEntropyCost implement the cross entropy function (Eq. 9)
+type CrossEntropyCost struct{}
+
+// Cost of the given output
+func (c *CrossEntropyCost) Cost(target, output []float64) (cost float64) {
+	nudge := 1e-15 // nudge all values up a little from 0-1 to make it impossible to do math.Log(0) which = -Inf
+	for i := range output {
+		n := (target[i] * math.Log(output[i]+nudge)) +
+			((1 - target[i]) * math.Log((1+nudge)-output[i]))
+		cost -= n
+	}
+	return
+}
