@@ -21,7 +21,7 @@ type Squasher interface {
 // SquashLogistic implements the logistic function.
 type SquashLogistic struct{}
 
-// Squashes x.
+// Squash x.
 func (s *SquashLogistic) Squash(x float64, derivate bool) float64 {
 	fx := 1.0 / (1.0 + math.Exp(-x))
 	if !derivate {
@@ -33,7 +33,7 @@ func (s *SquashLogistic) Squash(x float64, derivate bool) float64 {
 // SquashTanh implements tanh function.
 type SquashTanh struct{}
 
-// Squashes x.
+// Squash x.
 func (s *SquashTanh) Squash(x float64, derivate bool) float64 {
 	if derivate {
 		return 1 - math.Pow(math.Tanh(x), 2)
@@ -44,7 +44,7 @@ func (s *SquashTanh) Squash(x float64, derivate bool) float64 {
 // SquashIdentity implements the identity function.
 type SquashIdentity struct{}
 
-// Squashes x.
+// Squash x.
 func (s *SquashIdentity) Squash(x float64, derivate bool) float64 {
 	if derivate {
 		return 1
@@ -52,13 +52,13 @@ func (s *SquashIdentity) Squash(x float64, derivate bool) float64 {
 	return x
 }
 
-// SquashReLU implements the ReLU activation function, which is not subject to the Vanishing
+// SquashRelu implements the ReLU activation function, which is not subject to the Vanishing
 // Gradient problem
 // .
 // https://en.wikipedia.org/wiki/Rectifier_(neural_networks)
 type SquashRelu struct{}
 
-// Squashes x.
+// Squash x.
 func (s *SquashRelu) Squash(x float64, derivate bool) float64 {
 	if derivate {
 		if x > 0 {
