@@ -21,11 +21,13 @@ type LookupTable struct {
 	Connections []*Connection
 }
 
+// SetNeuron in the lookup table. Returns the ID for this neuron.
 func (t *LookupTable) SetNeuron(neuron *Neuron) NeuronID {
 	t.Neurons = append(t.Neurons, neuron)
 	return NeuronID(len(t.Neurons) - 1)
 }
 
+// GetNeuron from the lookup table. Returns nil if the ID does not exist in the table.
 func (t *LookupTable) GetNeuron(id NeuronID) *Neuron {
 	if int(id) > (len(t.Neurons) - 1) {
 		return nil
@@ -33,11 +35,14 @@ func (t *LookupTable) GetNeuron(id NeuronID) *Neuron {
 	return t.Neurons[id]
 }
 
+// SetConnection in the lookup table. Returns the ID for this connection.
 func (t *LookupTable) SetConnection(conn *Connection) ConnID {
 	t.Connections = append(t.Connections, conn)
 	return ConnID(len(t.Connections) - 1)
 }
 
+// SetConnectionWithID in the lookup table. If the ID is already associated with a Connection then
+// it is replaced.
 func (t *LookupTable) SetConnectionWithID(id ConnID, conn *Connection) {
 	if int(id) > (len(t.Connections) - 1) {
 		// pad out the slice
@@ -47,6 +52,7 @@ func (t *LookupTable) SetConnectionWithID(id ConnID, conn *Connection) {
 	t.Connections[id] = conn
 }
 
+// GetConnection from the lookup table. Returns nil if the ID does not exist in the table.
 func (t *LookupTable) GetConnection(id ConnID) *Connection {
 	if int(id) > (len(t.Connections) - 1) {
 		return nil
