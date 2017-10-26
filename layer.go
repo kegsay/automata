@@ -125,7 +125,7 @@ func (l *Layer) isConnected(targetLayer *Layer) bool {
 	for _, neuron := range l.List {
 		for _, target := range targetLayer.List {
 			if neuron.ConnectionForNeuron(target) != nil {
-				connCount += 1
+				connCount++
 			}
 		}
 	}

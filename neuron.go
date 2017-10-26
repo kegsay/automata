@@ -179,21 +179,20 @@ func (n *Neuron) Project(targetNeuron *Neuron, weight *float64) *Connection {
 			conn.Weight = *weight
 		}
 		return conn
-	} else {
-		conn = NewConnection(n, targetNeuron, weight)
-
-		// reference this connection and traces
-		n.Projected = append(n.Projected, conn.ID)
-		n.Neighbours = append(n.Neighbours, targetNeuron.ID)
-		targetNeuron.Inputs = append(targetNeuron.Inputs, conn.ID)
-		targetNeuron.setTraceEligibility(conn.ID, 0)
-		for nID := range n.TraceExtended {
-			trace := n.TraceExtended[nID]
-			trace[conn.ID] = 0
-		}
-		// fmt.Println("PROJECT: hooked ", n.ID, "to", targetNeuron.ID)
-		return conn
 	}
+	conn = NewConnection(n, targetNeuron, weight)
+
+	// reference this connection and traces
+	n.Projected = append(n.Projected, conn.ID)
+	n.Neighbours = append(n.Neighbours, targetNeuron.ID)
+	targetNeuron.Inputs = append(targetNeuron.Inputs, conn.ID)
+	targetNeuron.setTraceEligibility(conn.ID, 0)
+	for nID := range n.TraceExtended {
+		trace := n.TraceExtended[nID]
+		trace[conn.ID] = 0
+	}
+	// fmt.Println("PROJECT: hooked ", n.ID, "to", targetNeuron.ID)
+	return conn
 }
 
 func (n *Neuron) Gate(conn *Connection) {
@@ -228,11 +227,7 @@ func (n *Neuron) ConnectionForNeuron(target *Neuron) *Connection {
 	if c := n.getConnectionForNeuron(n.Inputs, target); c != nil {
 		return c
 	}
-	if c := n.getConnectionForNeuron(n.Gated, target); c != nil {
-		return c
-	}
-
-	return nil
+	return n.getConnectionForNeuron(n.Gated, target)
 }
 
 // learn by adjusting weights.
