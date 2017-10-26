@@ -43,7 +43,7 @@ func (c *BinaryCost) Cost(target, output []float64) float64 {
 	var misses float64
 	for i := range output {
 		if c.round(target[i]*2) != c.round(output[i]*2) {
-			misses += 1
+			misses ++
 		}
 	}
 	return misses
